@@ -1,0 +1,5 @@
+Pregnancies,Glucose,BloodPressure,SkinThickness,Insulin,BMI,DiabetesPedigreeFunction,Age,Prediction,Probability_No_Diabetes,Probability_Diabetes,Timestamp
+0,120,80,20,80,25,0.5,30,0,0.94,0.06,2025-06-15T20:38:35.036344
+0,147,72,20,0,25,0.5,30,0,0.66,0.34,2025-06-15T20:39:28.389152
+0,147,72,20,0,25,0.5,30,0,0.66,0.34,2025-06-15T20:39:29.951932
+0,120,80,20,80,25,0.5,30,0,0.94,0.06,2025-06-15T21:01:36.007257

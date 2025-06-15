@@ -1,0 +1,41 @@
+{
+  "accuracy": 0.7207792207792207,
+  "classification_report": {
+    "0": {
+      "precision": 0.7857142857142857,
+      "recall": 0.7777777777777778,
+      "f1-score": 0.7817258883248731,
+      "support": 99.0
+    },
+    "1": {
+      "precision": 0.6071428571428571,
+      "recall": 0.6181818181818182,
+      "f1-score": 0.6126126126126126,
+      "support": 55.0
+    },
+    "accuracy": 0.7207792207792207,
+    "macro avg": {
+      "precision": 0.6964285714285714,
+      "recall": 0.6979797979797979,
+      "f1-score": 0.6971692504687428,
+      "support": 154.0
+    },
+    "weighted avg": {
+      "precision": 0.721938775510204,
+      "recall": 0.7207792207792207,
+      "f1-score": 0.7213282898562086,
+      "support": 154.0
+    }
+  },
+  "training_date": "2025-06-15T20:33:11.708722",
+  "feature_names": [
+    "Pregnancies",
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI",
+    "DiabetesPedigreeFunction",
+    "Age"
+  ]
+}

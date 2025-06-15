@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetes Prediction Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+           background: #1c92d2;  /* fallback for old browsers */
+           background: -webkit-linear-gradient(to right, #f2fcfe, #1c92d2);  /* Chrome 10-25, Safari 5.1-6 */
+           background: linear-gradient(to right, #f2fcfe, #1c92d2); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color:  #08868f;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+                background: #36D1DC;  /* fallback for old browsers */
+                background: -webkit-linear-gradient(to right, #5B86E5, #36D1DC);  /* Chrome 10-25, Safari 5.1-6 */
+                background: linear-gradient(to right, #5B86E5, #36D1DC); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-card {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: #36D1DC;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #5B86E5, #36D1DC);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #5B86E5, #36D1DC); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .file-upload {
+            border: 2px dashed #08868f;;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: #764ba2;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .file-upload.dragover {
+            border-color: #764ba2;
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .prediction-history {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .prediction-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #08868f;
+        }
+
+        .prediction-item.diabetes {
+            border-left-color: #dc3545;
+        }
+
+        .prediction-item.no-diabetes {
+            border-left-color: #28a745;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .probability-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-heartbeat"></i> Diabetes Prediction Dashboard</h1>
+            <p class="subtitle">AI-Powered Health Assessment Tool</p>
+        </header>
+
+        <div class="dashboard-grid">
+            <!-- Real-time Prediction Card -->
+            <div class="card">
+                <h2><i class="fas fa-user-md"></i> Real-time Prediction</h2>
+                <form id="prediction-form">
+                    <div class="form-group">
+                        <label for="pregnancies">Pregnancies:</label>
+                        <input type="number" id="pregnancies" min="0" max="20" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="glucose">Glucose Level:</label>
+                        <input type="number" id="glucose" min="0" max="300" value="120" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bloodPressure">Blood Pressure:</label>
+                        <input type="number" id="bloodPressure" min="0" max="200" value="80" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="skinThickness">Skin Thickness:</label>
+                        <input type="number" id="skinThickness" min="0" max="100" value="20" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="insulin">Insulin:</label>
+                        <input type="number" id="insulin" min="0" max="1000" value="80" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bmi">BMI:</label>
+                        <input type="number" id="bmi" min="0" max="70" step="0.1" value="25.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="diabetesPedigree">Diabetes Pedigree Function:</label>
+                        <input type="number" id="diabetesPedigree" min="0" max="5" step="0.001" value="0.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" min="0" max="120" value="30" required>
+                    </div>
+                    <button type="submit" class="btn" id="predict-btn">
+                        <i class="fas fa-brain"></i> Predict Diabetes Risk
+                    </button>
+                </form>
+                <div id="prediction-result" class="result-card"></div>
+            </div>
+
+            <!-- Batch Prediction Card -->
+            <div class="card">
+                <h2><i class="fas fa-file-csv"></i> Batch Prediction</h2>
+                <div class="file-upload" id="file-upload">
+                    <i class="fas fa-cloud-upload-alt fa-3x" style="color: #08868f; margin-bottom: 10px;"></i>
+                    <p>Drop your CSV file here or click to browse</p>
+                    <input type="file" id="batch-file" accept=".csv" style="display: none;">
+                </div>
+                <button type="button" class="btn" id="batch-predict-btn" disabled style="margin-top: 15px;">
+                    <i class="fas fa-upload"></i> Process Batch File
+                </button>
+                <div id="batch-result" class="result-card"></div>
+            </div>
+
+            <!-- Statistics Card -->
+            <div class="card">
+                <h2><i class="fas fa-chart-bar"></i> Statistics</h2>
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-number" id="total-predictions">0</span>
+                        <span class="stat-label">Total Predictions</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number" id="diabetes-cases">0</span>
+                        <span class="stat-label">Diabetes Cases</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number" id="no-diabetes-cases">0</span>
+                        <span class="stat-label">No Diabetes</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number" id="model-accuracy">N/A</span>
+                        <span class="stat-label">Model Accuracy</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Information Card -->
+            <!-- <div class="card">
+                <h2><i class="fas fa-info-circle"></i> Model Information</h2>
+                <div id="model-info">
+                    <p><strong>Model Type:</strong> <span id="model-type">Loading...</span></p>
+                    <p><strong>Features:</strong> <span id="feature-count">Loading...</span></p>
+                    <p><strong>Last Trained:</strong> <span id="training-date">Loading...</span></p>
+                    <p><strong>Status:</strong> <span id="model-status">Loading...</span></p>
+                </div>
+            </div>
+        </div> -->
+
+        <!-- Prediction History -->
+        <!-- <div class="card">
+            <h2><i class="fas fa-history"></i> Recent Predictions</h2>
+            <div class="prediction-history" id="prediction-history">
+                <p>Loading prediction history...</p>
+            </div>
+        </div>
+    </div> -->
+
+    <script>
+        // API base URL
+        const API_BASE = '/api';
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadModelInfo();
+            loadStatistics();
+            loadPredictionHistory();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Real-time prediction form
+            document.getElementById('prediction-form').addEventListener('submit', handlePrediction);
+
+            // File upload
+            const fileUpload = document.getElementById('file-upload');
+            const fileInput = document.getElementById('batch-file');
+            const batchBtn = document.getElementById('batch-predict-btn');
+
+            fileUpload.addEventListener('click', () => fileInput.click());
+            fileUpload.addEventListener('dragover', handleDragOver);
+            fileUpload.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+            batchBtn.addEventListener('click', handleBatchPrediction);
+        }
+
+        async function handlePrediction(e) {
+            e.preventDefault();
+            const btn = document.getElementById('predict-btn');
+            const result = document.getElementById('prediction-result');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Predicting...';
+
+            try {
+                const formData = {
+                    Pregnancies: parseInt(document.getElementById('pregnancies').value),
+                    Glucose: parseInt(document.getElementById('glucose').value),
+                    BloodPressure: parseInt(document.getElementById('bloodPressure').value),
+                    SkinThickness: parseInt(document.getElementById('skinThickness').value),
+                    Insulin: parseInt(document.getElementById('insulin').value),
+                    BMI: parseFloat(document.getElementById('bmi').value),
+                    DiabetesPedigreeFunction: parseFloat(document.getElementById('diabetesPedigree').value),
+                    Age: parseInt(document.getElementById('age').value)
+                };
+
+                const response = await fetch(`${API_BASE}/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayPredictionResult(data, result);
+                    loadStatistics();
+                    loadPredictionHistory();
+                } else {
+                    showError(result, data.error);
+                }
+            } catch (error) {
+                showError(result, 'Network error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-brain"></i> Predict Diabetes Risk';
+            }
+        }
+
+        function displayPredictionResult(data, container) {
+            const diabetesProb = data.probabilities.diabetes * 100;
+            const noDiabetesProb = data.probabilities.no_diabetes * 100;
+            
+            container.className = `result-card result-success`;
+            container.style.display = 'block';
+            container.innerHTML = `
+                <h3><i class="fas fa-check-circle"></i> Prediction Result</h3>
+                <p><strong>Prediction:</strong> ${data.prediction_label}</p>
+                <p><strong>Confidence:</strong> ${(data.confidence * 100).toFixed(1)}%</p>
+                <div style="margin-top: 15px;">
+                    <p><strong>Probability Breakdown:</strong></p>
+                    <div style="margin: 10px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>No Diabetes:</span>
+                            <span>${noDiabetesProb.toFixed(1)}%</span>
+                        </div>
+                        <div class="probability-bar">
+                            <div class="probability-fill" style="width: ${noDiabetesProb}%; background: #28a745;"></div>
+                        </div>
+                    </div>
+                    <div style="margin: 10px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Diabetes:</span>
+                            <span>${diabetesProb.toFixed(1)}%</span>
+                        </div>
+                        <div class="probability-bar">
+                            <div class="probability-fill" style="width: ${diabetesProb}%; background: #dc3545;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('batch-file').files = files;
+                handleFileSelect();
+            }
+        }
+
+        function handleFileSelect() {
+            const fileInput = document.getElementById('batch-file');
+            const btn = document.getElementById('batch-predict-btn');
+            
+            if (fileInput.files.length > 0) {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-upload"></i> Process ${fileInput.files[0].name}`;
+            }
+        }
+
+        async function handleBatchPrediction() {
+            const fileInput = document.getElementById('batch-file');
+            const btn = document.getElementById('batch-predict-btn');
+            const result = document.getElementById('batch-result');
+
+            if (fileInput.files.length === 0) return;
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Processing...';
+
+            try {
+                const response = await fetch(`${API_BASE}/batch-predict`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    result.className = 'result-card result-success';
+                    result.style.display = 'block';
+                    result.innerHTML = `
+                        <h3><i class="fas fa-check-circle"></i> Batch Processing Complete</h3>
+                        <p><strong>Total Predictions:</strong> ${data.total_predictions}</p>
+                        <p><strong>Diabetes Cases:</strong> ${data.diabetes_cases}</p>
+                        <p><strong>No Diabetes Cases:</strong> ${data.total_predictions - data.diabetes_cases}</p>
+                        <p><strong>Output File:</strong> ${data.output_file}</p>
+                        <button class="btn" onclick="downloadFile('batch')" style="margin-top: 10px;">
+                            <i class="fas fa-download"></i> Download Results
+                        </button>
+                    `;
+                    loadStatistics();
+                    loadPredictionHistory();
+                } else {
+                    showError(result, data.error);
+                }
+            } catch (error) {
+                showError(result, 'Network error: ' + error.message);
+            } finally {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-upload"></i> Process Batch File';
+                fileInput.value = '';
+            }
+        }
+
+        async function loadModelInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/model-info`);
+                const data = await response.json();
+
+                document.getElementById('model-type').textContent = data.model_type || 'Unknown';
+                document.getElementById('feature-count').textContent = data.required_features?.length || 0;
+                document.getElementById('training-date').textContent = 
+                    data.metrics?.training_date ? new Date(data.metrics.training_date).toLocaleDateString() : 'Unknown';
+                document.getElementById('model-accuracy').textContent = 
+                    data.metrics?.accuracy ? (data.metrics.accuracy * 100).toFixed(1) + '%' : 'N/A';
+
+                // Health check
+                const healthResponse = await fetch(`${API_BASE}/health`);
+                const healthData = await healthResponse.json();
+                document.getElementById('model-status').textContent = 
+                    healthData.model_loaded ? 'Ready' : 'Not Ready';
+            } catch (error) {
+                console.error('Error loading model info:', error);
+            }
+        }
+
+        async function loadStatistics() {
+            try {
+                const response = await fetch(`${API_BASE}/statistics`);
+                const data = await response.json();
+
+                const totalPredictions = (data.realtime?.total || 0) + (data.batch?.total || 0);
+                const totalDiabetes = (data.realtime?.diabetes_cases || 0) + (data.batch?.diabetes_cases || 0);
+                const totalNoDiabetes = (data.realtime?.no_diabetes_cases || 0) + (data.batch?.no_diabetes_cases || 0);
+
+                document.getElementById('total-predictions').textContent = totalPredictions;
+                document.getElementById('diabetes-cases').textContent = totalDiabetes;
+                document.getElementById('no-diabetes-cases').textContent = totalNoDiabetes;
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        async function loadPredictionHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/predictions/history`);
+                const data = await response.json();
+                const historyContainer = document.getElementById('prediction-history');
+
+                if (data.predictions && data.predictions.length > 0) {
+                    historyContainer.innerHTML = data.predictions.map(pred => {
+                        const predictionClass = pred.Prediction === 1 ? 'diabetes' : 'no-diabetes';
+                        const predictionLabel = pred.Prediction === 1 ? 'Diabetes' : 'No Diabetes';
+                        const timestamp = pred.Timestamp ? new Date(pred.Timestamp).toLocaleString() : 'Unknown';
+                        
+                        return `
+                            <div class="prediction-item ${predictionClass}">
+                                <div style="display: flex; justify-content: between agreement; align-items: center;">
+                                    <div>
+                                        <strong>${predictionLabel}</strong>
+                                        <span style="margin-left: 10px; font-size: 0.9em; color: #666;">
+                                            ${pred.Type || 'Unknown'} | ${timestamp}
+                                        </span>
+                                    </div>
+                                    ${pred.Probability_Diabetes ? 
+                                        `<div style="font-size: 0.9em; color: #666;">
+                                            Confidence: ${(Math.max(pred.Probability_Diabetes, pred.Probability_No_Diabetes) * 100).toFixed(1)}%
+                                        </div>` : ''
+                                    }
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    historyContainer.innerHTML = '<p>No predictions yet. Make your first prediction above!</p>';
+                }
+            } catch (error) {
+                console.error('Error loading prediction history:', error);
+                document.getElementById('prediction-history').innerHTML = '<p>Error loading prediction history.</p>';
+            }
+        }
+
+        function downloadFile(type) {
+            window.open(`${API_BASE}/download/${type}`, '_blank');
+        }
+
+        function showError(container, message) {
+            container.className = 'result-card result-error';
+            container.style.display = 'block';
+            container.innerHTML = `
+                <h3><i class="fas fa-exclamation-triangle"></i> Error</h3>
+                <p>${message}</p>
+            `;
+        }
+
+        // Auto-refresh statistics and history every 30 seconds
+        setInterval(() => {
+            loadStatistics();
+            loadPredictionHistory();
+        }, 30000);
+    </script>
+</body>
+</html>
